@@ -22,6 +22,11 @@ export default function App() {
   const handleStart = () => {
     setGameState('PLAYING');
     setScore(0);
+    // Start background music on user interaction
+    const audio = document.getElementById('bg-music') as HTMLAudioElement;
+    if (audio) {
+      audio.play().catch(e => console.log("Autoplay blocked", e));
+    }
   };
 
   const handleGameOver = (won: boolean) => {
@@ -30,6 +35,20 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#050505] text-white font-sans overflow-hidden selection:bg-emerald-500/30">
+      {/* Background Image */}
+      <div 
+        className="fixed inset-0 pointer-events-none opacity-50 bg-cover bg-center mix-blend-overlay"
+        style={{ backgroundImage: 'url(https://picsum.photos/seed/battlefield/1920/1080?blur=1)' }}
+      />
+      
+      {/* Background Music */}
+      <audio 
+        id="bg-music"
+        loop 
+        src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" 
+        className="hidden"
+      />
+
       {/* Background Atmosphere */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden opacity-20">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-emerald-500/20 blur-[120px]" />
@@ -107,9 +126,18 @@ export default function App() {
           >
             {/* HUD */}
             <div className="absolute top-0 left-0 right-0 p-6 flex justify-between items-start z-20 pointer-events-none">
-              <div className="space-y-1">
-                <div className="text-xs font-mono text-white/40 uppercase tracking-widest">{t.score}</div>
-                <div className="text-4xl font-black italic tracking-tighter text-emerald-400">{score.toString().padStart(4, '0')}</div>
+              <div className="flex gap-8">
+                <div className="space-y-1">
+                  <div className="text-xs font-mono text-white/40 uppercase tracking-widest">{t.score}</div>
+                  <div className="text-4xl font-black italic tracking-tighter text-emerald-400">{score.toString().padStart(4, '0')}</div>
+                </div>
+                
+                <div className="space-y-1">
+                  <div className="text-xs font-mono text-white/40 uppercase tracking-widest">{lang === 'zh' ? '关卡' : 'LEVEL'}</div>
+                  <div className="text-4xl font-black italic tracking-tighter text-blue-400">
+                    {score < 300 ? '01' : (score < 600 ? '02' : '03')}
+                  </div>
+                </div>
               </div>
               
               <div className="flex gap-4">
