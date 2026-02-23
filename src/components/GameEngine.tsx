@@ -294,16 +294,53 @@ const GameEngine: React.FC<GameEngineProps> = ({ gameState, onScoreChange, onGam
     });
 
     // Draw Rockets
-    ctx.strokeStyle = '#ff0000';
-    ctx.lineWidth = 1;
     rocketsRef.current.forEach(r => {
+      // Draw trail
+      ctx.strokeStyle = 'rgba(255, 68, 68, 0.4)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([5, 5]);
       ctx.beginPath();
       ctx.moveTo(r.originX * w, 0);
       ctx.lineTo(r.x * w, r.y * h);
       ctx.stroke();
+      ctx.setLineDash([]);
       
+      // Calculate angle
+      const dx = (r.targetX - r.originX) * w;
+      const dy = 0.9 * h;
+      const angle = Math.atan2(dy, dx) - Math.PI / 2;
+
+      ctx.save();
+      ctx.translate(r.x * w, r.y * h);
+      ctx.rotate(angle);
+      
+      // Missile Body (larger)
+      ctx.fillStyle = '#ff4444';
+      ctx.beginPath();
+      ctx.moveTo(0, 5); // Tip
+      ctx.lineTo(-6, -15); // Left fin
+      ctx.lineTo(0, -10); // Bottom center
+      ctx.lineTo(6, -15); // Right fin
+      ctx.closePath();
+      ctx.fill();
+      
+      // Missile Core/Glow
       ctx.fillStyle = '#fff';
-      ctx.fillRect(r.x * w - 1, r.y * h - 1, 2, 2);
+      ctx.beginPath();
+      ctx.ellipse(0, -2, 3, 8, 0, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Fire effect at the back
+      const fireSize = 5 + Math.random() * 5;
+      const fireGradient = ctx.createRadialGradient(0, -12, 0, 0, -12, fireSize);
+      fireGradient.addColorStop(0, '#ffff00');
+      fireGradient.addColorStop(1, 'transparent');
+      ctx.fillStyle = fireGradient;
+      ctx.beginPath();
+      ctx.arc(0, -12, fireSize, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.restore();
     });
 
     // Draw Missiles
